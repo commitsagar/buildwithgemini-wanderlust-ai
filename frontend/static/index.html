@@ -14,6 +14,9 @@
     --primary-dark: #0369a1;
     --accent: #f97316;        /* Sunset Orange */
     --accent-gold: #f59e0b;
+    --magic-purple: #8b5cf6;
+    --magic-rose: #ec4899;
+    --magic-cyan: #06b6d4;
     --bg-page: #f8fafc;
     --card-bg: #ffffff;
     --border: #e2e8f0;
@@ -322,8 +325,121 @@
     font-size: 1.4rem;
     flex-shrink: 0;
   }
-  .food-title { font-weight: 700; font-size: 0.95rem; }
-  .food-subtitle { font-size: 0.8rem; color: var(--text-muted); }
+  /* Magical Moments Showcase */
+  .magical-section {
+    background: radial-gradient(circle at 10% 20%, rgba(139, 92, 246, 0.08) 0%, rgba(236, 72, 153, 0.05) 50%, rgba(248, 250, 252, 0) 100%);
+    border-top: 1px solid rgba(226, 232, 240, 0.8);
+    border-bottom: 1px solid rgba(226, 232, 240, 0.8);
+    padding: 4.5rem 0;
+    margin: 4rem 0;
+  }
+  .magic-header-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.35rem 0.9rem;
+    background: linear-gradient(135deg, rgba(139, 92, 246, 0.12), rgba(236, 72, 153, 0.12));
+    border: 1px solid rgba(139, 92, 246, 0.25);
+    border-radius: 999px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: #7c3aed;
+    margin-bottom: 0.8rem;
+  }
+  .magic-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1.75rem;
+    margin-top: 1.5rem;
+  }
+  .magic-card {
+    position: relative;
+    border-radius: 20px;
+    overflow: hidden;
+    height: 380px;
+    box-shadow: 0 10px 30px rgba(15, 23, 42, 0.1);
+    transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s ease;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+  }
+  .magic-card:hover {
+    transform: translateY(-8px) scale(1.02);
+    box-shadow: 0 20px 40px rgba(139, 92, 246, 0.25);
+  }
+  .magic-bg {
+    position: absolute;
+    inset: 0;
+    background-size: cover;
+    background-position: center;
+    transition: transform 0.5s ease;
+  }
+  .magic-card:hover .magic-bg {
+    transform: scale(1.08);
+  }
+  .magic-gradient {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, rgba(15, 23, 42, 0.1) 0%, rgba(15, 23, 42, 0.4) 40%, rgba(15, 23, 42, 0.92) 100%);
+  }
+  .magic-badge {
+    position: absolute;
+    top: 16px;
+    left: 16px;
+    background: rgba(255, 255, 255, 0.22);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    color: #ffffff;
+    padding: 0.3rem 0.75rem;
+    border-radius: 999px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+  }
+  .magic-body {
+    position: relative;
+    z-index: 2;
+    padding: 1.5rem;
+    color: #ffffff;
+  }
+  .magic-time {
+    font-size: 0.8rem;
+    color: #fbcfe8;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 0.3rem;
+  }
+  .magic-title {
+    font-family: 'Playfair Display', Georgia, serif;
+    font-size: 1.35rem;
+    font-weight: 700;
+    line-height: 1.3;
+    margin-bottom: 0.4rem;
+  }
+  .magic-desc {
+    font-size: 0.82rem;
+    color: rgba(255, 255, 255, 0.8);
+    line-height: 1.45;
+    margin-bottom: 1rem;
+  }
+  .magic-btn-preview {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.45rem 0.9rem;
+    border-radius: 999px;
+    background: linear-gradient(135deg, #ec4899, #8b5cf6);
+    color: #ffffff;
+    font-size: 0.78rem;
+    font-weight: 700;
+    border: none;
+    box-shadow: 0 4px 12px rgba(236, 72, 153, 0.4);
+    cursor: pointer;
+  }
 
   /* Floating Concierge Chatbot Drawer / Widget */
   .chat-floating-button {
@@ -584,6 +700,7 @@
   </a>
   <div class="nav-links">
     <a href="#destinations" class="nav-link">Destinations</a>
+    <a href="#magical-moments" class="nav-link" style="color:#7c3aed; font-weight:700;">✨ Magical Moments</a>
     <a href="#culinary" class="nav-link">Dietary Dining</a>
     <a href="#postcards" class="nav-link">AI Postcards</a>
     <button class="btn-nav-chat" onclick="openAssistant('Plan a trip for me')">
@@ -695,6 +812,99 @@
         <div class="dest-footer">
           <span class="dest-price">🕒 Live Clock Grounded</span>
           <span class="dest-action-text">Check Weather →</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Magical Moments Section -->
+<section class="magical-section" id="magical-moments">
+  <div class="section-container" style="margin: 0 auto;">
+    <div class="section-header">
+      <div>
+        <div class="magic-header-pill">✨ Enchanting Escapes</div>
+        <h2 class="section-title">Magical Moments Around the Globe</h2>
+        <p class="section-sub">Rare atmospheric wonders, golden hour horizons, and once-in-a-lifetime memories curated by AI.</p>
+      </div>
+      <div>
+        <button class="btn-action primary" onclick="openAssistant('Suggest a magical bucket-list travel moment for a couple with dietary dining')" style="background:linear-gradient(135deg, #ec4899, #8b5cf6);">
+          <span class="material-symbols-outlined" style="font-size:1rem;">auto_awesome</span>
+          Ask for a Magical Moment
+        </button>
+      </div>
+    </div>
+
+    <div class="magic-grid">
+      <!-- Card 1: Santorini Sunset -->
+      <div class="magic-card" onclick="openAssistant('Plan a magical sunset evening in Oia Santorini with cliffside vegan dinner options')">
+        <div class="magic-bg" style="background-image: url('https://images.unsplash.com/photo-1570077188670-e3a8d69ac5ff?auto=format&fit=crop&w=800&q=80');"></div>
+        <div class="magic-gradient"></div>
+        <div class="magic-badge">
+          <span>🌅 Golden Hour Glow</span>
+        </div>
+        <div class="magic-body">
+          <div class="magic-time">Oia, Santorini • Dusk</div>
+          <div class="magic-title">Caldera Twilight & Sunken Horizon</div>
+          <p class="magic-desc">Whitewashed cycladic rooftops bathed in honeyed lavender hues overlooking the Aegean deep.</p>
+          <button class="magic-btn-preview">
+            <span class="material-symbols-outlined" style="font-size:0.95rem;">magic_button</span>
+            Plan Twilight Walk
+          </button>
+        </div>
+      </div>
+
+      <!-- Card 2: Kyoto Bamboo & Lanterns -->
+      <div class="magic-card" onclick="openAssistant('Describe a serene early morning bamboo walk in Arashiyama Kyoto with a traditional matcha teahouse')">
+        <div class="magic-bg" style="background-image: url('https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?auto=format&fit=crop&w=800&q=80');"></div>
+        <div class="magic-gradient"></div>
+        <div class="magic-badge">
+          <span>🎋 Zen Awakening</span>
+        </div>
+        <div class="magic-body">
+          <div class="magic-time">Arashiyama, Kyoto • Dawn</div>
+          <div class="magic-title">Emerald Whispers in Bamboo Groves</div>
+          <p class="magic-desc">Misty morning rays piercing soaring emerald stalks with distant temple bells and green tea aromas.</p>
+          <button class="magic-btn-preview">
+            <span class="material-symbols-outlined" style="font-size:0.95rem;">spa</span>
+            Explore Zen Route
+          </button>
+        </div>
+      </div>
+
+      <!-- Card 3: Amalfi Coast Cliffside -->
+      <div class="magic-card" onclick="openAssistant('Plan a 3-day romantic itinerary along the Amalfi Coast with scenic viewpoints and fresh Italian dining')">
+        <div class="magic-bg" style="background-image: url('https://images.unsplash.com/photo-1533105079780-92b9be482077?auto=format&fit=crop&w=800&q=80');"></div>
+        <div class="magic-gradient"></div>
+        <div class="magic-badge">
+          <span>🍋 Mediterranean Breeze</span>
+        </div>
+        <div class="magic-body">
+          <div class="magic-time">Positano, Italy • Afternoon</div>
+          <div class="magic-title">Pastel Cascades & Turquoise Tides</div>
+          <p class="magic-desc">Terraced lemon orchards clinging to sheer cliffs dropping precipitously into azure waters.</p>
+          <button class="magic-btn-preview">
+            <span class="material-symbols-outlined" style="font-size:0.95rem;">sailing</span>
+            Curate Coastal Tour
+          </button>
+        </div>
+      </div>
+
+      <!-- Card 4: Tromsø Aurora Borealis -->
+      <div class="magic-card" onclick="openAssistant('How do I plan a 4-day Northern Lights winter excursion in Tromso Norway with local dining?')">
+        <div class="magic-bg" style="background-image: url('https://images.unsplash.com/photo-1579033461380-adb47c3eb938?auto=format&fit=crop&w=800&q=80');"></div>
+        <div class="magic-gradient"></div>
+        <div class="magic-badge">
+          <span>🌌 Celestial Aurora</span>
+        </div>
+        <div class="magic-body">
+          <div class="magic-time">Tromsø, Norway • Midnight</div>
+          <div class="magic-title">Dancing Ribbons of the Arctic Sky</div>
+          <p class="magic-desc">Cosmic green and violet curtains rippling across snow-capped peaks beneath crisp starry night air.</p>
+          <button class="magic-btn-preview">
+            <span class="material-symbols-outlined" style="font-size:0.95rem;">bedtime</span>
+            Chase Aurora
+          </button>
         </div>
       </div>
     </div>
