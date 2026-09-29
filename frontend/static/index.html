@@ -10,18 +10,20 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined">
 <style>
   :root {
-    --primary: #0284c7;       /* Ocean Mediterranean Blue */
-    --primary-dark: #0369a1;
-    --accent: #f97316;        /* Sunset Orange */
+    --primary: #4338ca;       /* Royal Indigo */
+    --primary-light: #6366f1;
+    --primary-dark: #312e81;
+    --accent: #f43f5e;        /* Rose Sunrise */
     --accent-gold: #f59e0b;
-    --magic-purple: #8b5cf6;
+    --magic-purple: #9333ea;
+    --magic-violet: #7c3aed;
     --magic-rose: #ec4899;
     --magic-cyan: #06b6d4;
-    --bg-page: #f8fafc;
+    --bg-page: #faf5ff;       /* Very soft lavender blush */
     --card-bg: #ffffff;
-    --border: #e2e8f0;
-    --text-dark: #0f172a;
-    --text-muted: #64748b;
+    --border: #e9d5ff;        /* Soft lilac border */
+    --text-dark: #1e1b4b;     /* Midnight Indigo */
+    --text-muted: #6b7280;
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body {
@@ -104,44 +106,47 @@
   /* Hero Section */
   .hero {
     position: relative;
-    padding: 4.5rem 1.5rem 3.5rem;
+    padding: 5rem 1.5rem 4rem;
     text-align: center;
-    background: linear-gradient(180deg, #e0f2fe 0%, #f0fdf4 50%, #f8fafc 100%);
+    background: radial-gradient(circle at 50% 10%, rgba(147, 51, 234, 0.12) 0%, rgba(244, 63, 94, 0.08) 45%, #faf5ff 100%);
     overflow: hidden;
   }
   .hero-pill {
     display: inline-flex;
     align-items: center;
     gap: 0.4rem;
-    background: #ffffff;
-    border: 1px solid #bae6fd;
-    padding: 0.35rem 0.9rem;
+    background: rgba(255, 255, 255, 0.9);
+    border: 1px solid #d8b4fe;
+    padding: 0.4rem 1.1rem;
     border-radius: 999px;
     font-size: 0.82rem;
     font-weight: 700;
-    color: var(--primary-dark);
+    color: #6b21a8;
     margin-bottom: 1.25rem;
-    box-shadow: 0 1px 4px rgba(0,0,0,0.03);
+    box-shadow: 0 4px 15px rgba(147, 51, 234, 0.12);
   }
   .hero h1 {
     font-family: 'Playfair Display', Georgia, serif;
-    font-size: 3.1rem;
+    font-size: 3.3rem;
     font-weight: 700;
     letter-spacing: -0.02em;
-    color: #0f172a;
-    max-width: 780px;
+    color: #1e1b4b;
+    max-width: 820px;
     margin: 0 auto 1.1rem;
     line-height: 1.2;
   }
   .hero h1 span {
-    color: var(--primary);
+    background: linear-gradient(135deg, #7c3aed, #f43f5e);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
     font-style: italic;
   }
   .hero p {
-    font-size: 1.15rem;
-    color: var(--text-muted);
-    max-width: 620px;
-    margin: 0 auto 2.2rem;
+    font-size: 1.12rem;
+    color: #4b5563;
+    max-width: 640px;
+    margin: 0 auto 2.5rem;
+    line-height: 1.6;
   }
 
   /* Quick Planner Action Bar */
@@ -982,7 +987,7 @@
     </div>
   </div>
 
-  <div class="drawer-chips">
+  <div class="drawer-chips" id="drawer-chips">
     <div class="d-chip" onclick="sendPrompt('Plan a 3-day vegan itinerary for Tokyo with sights and dining')">📅 3-Day Tokyo</div>
     <div class="d-chip" onclick="sendPrompt('Generate a scenic postcard of Mount Fuji at sunrise')">🎨 Fuji Postcard</div>
     <div class="d-chip" onclick="sendPrompt('Plan a 3-day Paris itinerary and convert $500 to EUR')">🗼 Paris & Budget</div>
@@ -1363,8 +1368,65 @@ function renderReply(b, parts) {
     b.appendChild(widget);
   }
 
+  // Dynamically update suggestion chips relative to the trip context
+  updateDynamicSuggestions(fullReplyText);
+
   if (!b.childNodes.length) b.textContent = "(no response)";
   log.scrollTop = log.scrollHeight;
+}
+
+function updateDynamicSuggestions(text) {
+  const container = document.getElementById("drawer-chips");
+  if (!container) return;
+
+  const t = (text || "").toLowerCase();
+  let chips = [];
+
+  if (t.includes("tokyo") || t.includes("japan") || t.includes("kyoto")) {
+    chips = [
+      { label: "🍵 Matcha Tea Experience", prompt: "Recommend the most authentic traditional tea ceremony spots in Kyoto or Tokyo" },
+      { label: "💰 Trip Budget Estimate", prompt: "Calculate an estimated budget in USD for this Japan trip using the code sandbox" },
+      { label: "🖼️ Paint Scenic Postcard", prompt: "Generate a scenic vintage postcard of Mount Fuji or Kyoto temples and show it" },
+      { label: "⛅ Check Live Weather", prompt: "What is the live weather and local time in Tokyo right now?" }
+    ];
+  } else if (t.includes("paris") || t.includes("france")) {
+    chips = [
+      { label: "🥐 Celiac Bakeries", prompt: "Find 100% gluten-free and celiac-safe patisseries in Paris with addresses" },
+      { label: "💶 Convert to EUR", prompt: "Convert $1000 USD to EUR with live exchange rates for our Paris trip" },
+      { label: "🖼️ Paris Colosseum/Louvre Postcard", prompt: "Generate a scenic vintage postcard of Paris along the Seine at sunset" },
+      { label: "🍷 Evening Itinerary", prompt: "Suggest a relaxing evening stroll and dinner recommendation for Paris Day 2" }
+    ];
+  } else if (t.includes("santorini") || t.includes("greece")) {
+    chips = [
+      { label: "🌅 Oia Sunset Spots", prompt: "What are the best secluded cliffside spots in Oia Santorini to watch the sunset?" },
+      { label: "🥗 Greek Vegan Tavernas", prompt: "Recommend traditional Greek tavernas in Santorini serving plant-based dishes" },
+      { label: "⛵ Catamaran Cruise", prompt: "Plan a half-day caldera catamaran cruise with swimming spots" },
+      { label: "💰 Greece Budget Split", prompt: "Calculate an estimated 3-day budget for a couple in Santorini in USD" }
+    ];
+  } else if (t.includes("itinerary") || t.includes("day 1") || t.includes("day 2")) {
+    chips = [
+      { label: "💰 Budget Estimation", prompt: "Can you calculate an estimated budget breakdown for this itinerary in USD?" },
+      { label: "🎨 Generate Postcard", prompt: "Generate a scenic vintage postcard image for the main landmark of this trip" },
+      { label: "🎥 Omni Video Preview", prompt: "Generate a short cinematic video preview clip of this destination using Omni" },
+      { label: "⭐ Save Bookmarks", prompt: "Save these top recommended spots into my travel bookmarks in Firestore" }
+    ];
+  } else {
+    chips = [
+      { label: "📅 3-Day Kyoto", prompt: "Plan a 3-day vegan itinerary for Kyoto with sights and dining" },
+      { label: "✨ Magical Moment", prompt: "Suggest a magical bucket-list travel moment for a couple with dietary dining" },
+      { label: "🎨 Fuji Postcard", prompt: "Generate a scenic postcard of Mount Fuji at sunrise" },
+      { label: "⛅ Live Weather", prompt: "What is the live weather and time in London right now?" }
+    ];
+  }
+
+  container.innerHTML = "";
+  chips.forEach(c => {
+    const chip = document.createElement("div");
+    chip.className = "d-chip";
+    chip.textContent = c.label;
+    chip.onclick = () => sendPrompt(c.prompt);
+    container.appendChild(chip);
+  });
 }
 
 form.addEventListener("submit", async (ev) => {
