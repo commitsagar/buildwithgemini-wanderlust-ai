@@ -2,10 +2,10 @@
 
 An agentic travel concierge and dietary itinerary planner built with Google Agent Development Kit (ADK) and Gemini on Google Cloud Platform. Wanderlust AI helps travelers explore global destinations, discover dietary-safe dining (vegan, gluten-free, allergy-conscious), generate scenic vintage postcards and cinematic Omni video previews, plan interactive daily schedules with calendar exports, and compute travel budgets.
 
-[![Wanderlust AI Live Demo](https://storage.googleapis.com/wanderlust-ai-qwiklabs-gcp-03-5d6b9bcda8e5/wanderlust_concierge_demo_v2.gif)](https://wanderlust-frontend-57498790528.us-east1.run.app)
+[![Wanderlust AI Live Demo](https://storage.googleapis.com/wanderlust-ai-qwiklabs-gcp-03-5d6b9bcda8e5/wanderlust_concierge_demo_v3.gif)](https://wanderlust-frontend-57498790528.us-east1.run.app)
 
 > 🌐 **Live Portal**: [wanderlust-frontend-57498790528.us-east1.run.app](https://wanderlust-frontend-57498790528.us-east1.run.app)  
-> 🎥 **Direct Video Preview**: [Watch High-Definition Demo MP4](https://storage.googleapis.com/wanderlust-ai-qwiklabs-gcp-03-5d6b9bcda8e5/wanderlust_concierge_demo_v2.mp4) (with Gemini World Tour frame)
+> 🎥 **Direct Video Preview**: [Watch High-Definition Demo MP4](https://storage.googleapis.com/wanderlust-ai-qwiklabs-gcp-03-5d6b9bcda8e5/wanderlust_concierge_demo_v3.mp4) (Interactive Fullscreen Travel Advisor, Multi-Day Itineraries, and Sandbox Budgeting)
 
 ---
 
