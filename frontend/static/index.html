@@ -471,8 +471,8 @@
     position: fixed;
     bottom: 96px;
     right: 24px;
-    width: 440px;
-    height: 620px;
+    width: 460px;
+    height: 640px;
     max-width: calc(100vw - 48px);
     max-height: calc(100vh - 120px);
     background: #ffffff;
@@ -483,7 +483,19 @@
     display: flex;
     flex-direction: column;
     overflow: hidden;
-    transition: opacity 0.2s ease, transform 0.2s ease;
+    transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+  .chat-drawer.fullscreen {
+    top: 20px;
+    bottom: 20px;
+    left: 20px;
+    right: 20px;
+    width: auto;
+    height: auto;
+    max-width: none;
+    max-height: none;
+    border-radius: 24px;
+    box-shadow: 0 25px 60px rgba(15, 23, 42, 0.35);
   }
   .chat-drawer.hidden {
     opacity: 0;
@@ -491,12 +503,33 @@
     transform: translateY(20px) scale(0.95);
   }
   .chat-drawer-header {
-    background: linear-gradient(135deg, #0284c7, #0f766e);
+    background: linear-gradient(135deg, var(--primary), #4f46e5);
     color: #fff;
     padding: 0.9rem 1.25rem;
     display: flex;
     align-items: center;
     justify-content: space-between;
+  }
+  .chat-header-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+  }
+  .btn-header-action {
+    background: rgba(255, 255, 255, 0.15);
+    border: none;
+    color: #fff;
+    cursor: pointer;
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.15s ease;
+  }
+  .btn-header-action:hover {
+    background: rgba(255, 255, 255, 0.3);
   }
   .chat-header-info { display: flex; align-items: center; gap: 0.6rem; }
   .chat-header-avatar {
@@ -567,7 +600,30 @@
     border: none;
     border-bottom-right-radius: 3px;
   }
-  .msg.agent .bubble { border-bottom-left-radius: 3px; }
+  .msg.agent .bubble {
+    border-bottom-left-radius: 3px;
+    background: #ffffff;
+    color: var(--text-dark);
+  }
+  .msg.agent .bubble h3 {
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: var(--primary);
+    margin: 0.8rem 0 0.35rem 0;
+  }
+  .msg.agent .bubble h3:first-child { margin-top: 0; }
+  .msg.agent .bubble h4 {
+    font-size: 0.96rem;
+    font-weight: 700;
+    color: var(--text-dark);
+    margin: 0.6rem 0 0.25rem 0;
+  }
+  .msg.agent .bubble p { margin-bottom: 0.5rem; }
+  .msg.agent .bubble ul, .msg.agent .bubble ol {
+    margin: 0.3rem 0 0.6rem 1.25rem;
+  }
+  .msg.agent .bubble li { margin-bottom: 0.3rem; }
+  .msg.agent .bubble strong { color: #1e1b4b; font-weight: 700; }
   .bubble.rich { background: transparent; border: none; padding: 0; box-shadow: none; white-space: normal; }
 
   /* Chat Drawer Input & Chips */
@@ -975,9 +1031,14 @@
         <div class="chat-header-status">● Ready • Memory & A2UI Active</div>
       </div>
     </div>
-    <button class="btn-close-chat" onclick="toggleDrawer()">
-      <span class="material-symbols-outlined">close</span>
-    </button>
+    <div class="chat-header-actions">
+      <button class="btn-header-action" onclick="toggleFullscreen()" title="Toggle Fullscreen Advisor View" id="btn-fullscreen-toggle">
+        <span class="material-symbols-outlined" style="font-size:1.15rem;" id="fs-icon">open_in_full</span>
+      </button>
+      <button class="btn-header-action" onclick="toggleDrawer()" title="Close Assistant">
+        <span class="material-symbols-outlined" style="font-size:1.15rem;">close</span>
+      </button>
+    </div>
   </div>
 
   <div id="log">
@@ -1008,6 +1069,18 @@ const drawer = document.getElementById("chat-drawer");
 
 function toggleDrawer() {
   drawer.classList.toggle("hidden");
+}
+
+function toggleFullscreen() {
+  drawer.classList.toggle("fullscreen");
+  const icon = document.getElementById("fs-icon");
+  if (drawer.classList.contains("fullscreen")) {
+    icon.textContent = "close_fullscreen";
+    document.getElementById("btn-fullscreen-toggle").title = "Exit Fullscreen";
+  } else {
+    icon.textContent = "open_in_full";
+    document.getElementById("btn-fullscreen-toggle").title = "Toggle Fullscreen Advisor View";
+  }
 }
 
 function openAssistant(query) {
@@ -1335,7 +1408,23 @@ function renderReply(b, parts) {
   }
 
   if (texts.length && texts.join("").trim()) {
-    b.appendChild(el("div", null, texts.join("\n").trim()));
+    const rawText = texts.join("\n").trim();
+    const textNode = document.createElement("div");
+    textNode.className = "itinerary-prose";
+    // Convert markdown bold, headers, list items, and star ratings cleanly
+    let html = rawText
+      .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
+      .replace(/^#### (.*$)/gim, '<h4>$1</h4>')
+      .replace(/^### (.*$)/gim, '<h3>$1</h3>')
+      .replace(/^## (.*$)/gim, '<h2>$1</h2>')
+      .replace(/\*\*(.*?)\*\*/gim, '<strong>$1</strong>')
+      .replace(/\*(.*?)\*/gim, '<em>$1</em>')
+      .replace(/^\s*[-*•]\s+(.*$)/gim, '<li>$1</li>')
+      .replace(/(<li>.*<\/li>)/gis, '<ul>$1</ul>')
+      .replace(/\n\n+/g, '<br><br>')
+      .replace(/\n/g, '<br>');
+    textNode.innerHTML = html;
+    b.appendChild(textNode);
   }
 
   if (a2ui.length) {
