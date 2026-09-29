@@ -456,6 +456,116 @@ async def generate_destination_image(
         return f"Error generating destination image: {str(e)}"
 
 
+async def generate_destination_video(
+    prompt: str,
+    tool_context: "ToolContext",
+) -> str:
+    """Generates a short, realistic video preview for a travel destination, landmark, activity, or food scene.
+
+    Uses Google's Omni video model (gemini-omni-flash-preview) in the global region.
+    Saves the video artifact with tool_context.save_artifact so it shows in the Playground Artifacts panel,
+    and uploads the video bytes to the public Cloud Storage bucket, returning its public HTTPS URL.
+
+    Args:
+        prompt: Detailed description of the video clip to generate (e.g. 'Cinematic aerial video of Mount Fuji at sunrise with rolling mist').
+        tool_context: ADK ToolContext used to save session artifacts.
+
+    Returns:
+        The public HTTPS URL of the video hosted in Cloud Storage.
+    """
+    import uuid
+    import re
+    import base64
+    import asyncio
+    import google.auth
+    import google.auth.transport.requests
+    import requests
+    from google.genai import types
+    from google.cloud import storage
+
+    creds, project = google.auth.default()
+    creds.refresh(google.auth.transport.requests.Request())
+
+    url = f"https://aiplatform.googleapis.com/v1beta1/projects/{PROJECT_ID}/locations/global/interactions"
+    headers = {
+        "Authorization": f"Bearer {creds.token}",
+        "Content-Type": "application/json; charset=utf-8",
+    }
+    body = {
+        "model": "gemini-omni-flash-preview",
+        "background": True,
+        "input": [{"type": "text", "text": prompt}],
+        "response_format": [
+            {
+                "type": "video",
+                "aspect_ratio": "16:9",
+                "duration": "3s",
+            }
+        ],
+        "generation_config": {
+            "video_config": {
+                "task": "text_to_video",
+            }
+        },
+    }
+
+    try:
+        resp = requests.post(url, headers=headers, json=body, timeout=30)
+        if resp.status_code != 200:
+            return f"Error initiating video generation with Omni: {resp.text}"
+
+        data = resp.json()
+        interaction_id = data.get("id")
+        if not interaction_id:
+            return f"Error: No interaction ID returned from Omni: {data}"
+
+        poll_url = f"{url}/{interaction_id}"
+        video_bytes = None
+        mime_type = "video/mp4"
+
+        # Poll for completion (up to ~90s)
+        for _ in range(18):
+            await asyncio.sleep(5)
+            poll_resp = requests.get(poll_url, headers=headers, timeout=20)
+            if poll_resp.status_code != 200:
+                continue
+            poll_data = poll_resp.json()
+            status = poll_data.get("status")
+            if status == "completed":
+                for step in poll_data.get("steps", []):
+                    if step.get("type") == "model_output":
+                        for content in step.get("content", []):
+                            if content.get("type") == "video":
+                                b64 = content.get("data")
+                                if b64:
+                                    video_bytes = base64.b64decode(b64)
+                                    mime_type = content.get("mime_type", "video/mp4")
+                                    break
+                break
+            elif status == "failed":
+                return f"Error: Omni video generation failed: {poll_data.get('error')}"
+
+        if not video_bytes:
+            return "Error: Timed out waiting for Omni video generation to complete."
+
+        # 1. Save artifact with tool_context.save_artifact for Playground Artifacts panel
+        clean_slug = re.sub(r"[^a-zA-Z0-9_-]", "_", prompt[:30]).strip("_").lower()
+        filename = f"{clean_slug}_{uuid.uuid4().hex[:6]}.mp4"
+        artifact_part = types.Part.from_bytes(data=video_bytes, mime_type=mime_type)
+        await tool_context.save_artifact(filename=filename, artifact=artifact_part)
+
+        # 2. Upload video bytes to public Cloud Storage bucket
+        storage_client = storage.Client(project=PROJECT_ID)
+        bucket = storage_client.bucket(STORAGE_BUCKET_NAME)
+        blob = bucket.blob(filename)
+        blob.upload_from_string(video_bytes, content_type=mime_type)
+
+        public_url = f"https://storage.googleapis.com/{STORAGE_BUCKET_NAME}/{filename}"
+        return f"Video preview generated successfully with Omni!\n- Public Video URL: {public_url}\n- Artifact saved: {filename}"
+    except Exception as e:
+        return f"Error generating destination video with Omni: {str(e)}"
+
+
 from google.adk.code_executors import AgentEngineSandboxCodeExecutor
 
 # Agent Engine Reasoning Engine resource name from deployment_metadata.json
@@ -486,22 +596,23 @@ a2ui_instruction = schema_manager.generate_system_prompt(
         "Help travelers discover destinations, find dietary-tailored restaurants, "
         "check live weather, convert currencies with real exchange rates, "
         "lookup geographic coordinates with Google Geocoding, find nearby spots with Google Places, "
-        "generate visual postcards and destination images, "
+        "generate visual postcards and destination images with Gemini Image, "
+        "generate short video previews with Google Omni (gemini-omni-flash-preview), "
         "run Python computations and budget calculations using your code execution sandbox, "
         "and read/write their saved travel bookmarks using Firestore."
     ),
     workflow_description="Analyze the request, call tools to gather accurate data, and return structured UI when appropriate.",
     ui_description=(
-        "Keep every surface tiny and flat: ONE Card > ONE Column > a few Text rows. "
-        "Never nest a Card inside a Card. "
+        "If responding with UI, keep every surface tiny, flat, and compact: ONE Card > ONE Column > components. "
+        "Total maximum 5 components across the whole surface. "
+        "Never nest Cards inside Cards or create deep component trees. "
         "Use ONLY these components: Card, Column, Row, Text, and Image. Do not use "
         "Table or Heading (unsupported), or Buttons, actions, or forms (they do "
         "nothing in adk web). "
-        "You may include one Image component, but only when you have a public https "
-        "URL for the image (for example the URL an image tool returns after uploading "
-        "to a public bucket). Set the Image url to that exact https link, for example "
-        '{"Image": {"url": {"literalString": "https://..."}}}. Never point an '
-        "Image at a bare filename, an artifact name, or a non-http(s) path. If you do "
+        "When generating or showing an image, include an Image component in the Column child list alongside title/description Text, "
+        "and set its URL to the public https link returned by generate_destination_image, for example: "
+        '{"id": "img1", "component": {"Image": {"url": {"literalString": "https://storage.googleapis.com/..."}}}}. '
+        "Never point an Image at a bare filename, an artifact name, or a non-http(s) path. If you do "
         "not have a public URL, add a short Text line noting the image instead. "
         "No markdown in text; use the usageHint property ('h1', 'h2', 'body') for "
         "headings and emphasis. "
@@ -523,6 +634,7 @@ root_agent = Agent(
     tools=[
         PreloadMemoryTool(),
         generate_destination_image,
+        generate_destination_video,
         search_dietary_restaurants,
         geocode_address,
         search_nearby_places,

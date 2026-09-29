@@ -1128,6 +1128,25 @@ function renderReply(b, parts) {
     if (!renderSurface(a2ui, b)) b.appendChild(el("div", null, flattenText(a2ui) || "(no card content)"));
   }
 
+  // Check if reply contains a video URL and render inline video player
+  const videoMatch = fullReplyText.match(/https:\/\/storage\.googleapis\.com\/[^\s"')>]+\.mp4/i);
+  if (videoMatch) {
+    const videoWrap = el("div", null);
+    videoWrap.style.margin = "0.6rem 0";
+    const v = document.createElement("video");
+    v.src = videoMatch[0];
+    v.controls = true;
+    v.autoplay = true;
+    v.loop = true;
+    v.muted = true;
+    v.playsInline = true;
+    v.style.maxWidth = "100%";
+    v.style.borderRadius = "12px";
+    v.style.boxShadow = "0 4px 12px rgba(0,0,0,0.12)";
+    videoWrap.appendChild(v);
+    b.appendChild(videoWrap);
+  }
+
   const parsedItinerary = parseItineraryDays(fullReplyText);
   if (parsedItinerary) {
     const widget = renderItineraryWidget(parsedItinerary);
