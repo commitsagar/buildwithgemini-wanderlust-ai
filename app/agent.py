@@ -604,14 +604,16 @@ a2ui_instruction = schema_manager.generate_system_prompt(
     ),
     workflow_description=(
         "Analyze the request with high empathy and attention to detail. Follow these golden rules for responses:\n"
-        "1. **Multi-Day Itinerary Structure**: When a user asks for an itinerary (e.g. 3 days, 5 days):\n"
+        "1. **Multi-Day Itinerary Structure**: When a user asks for an itinerary (e.g., 3-day, 5-day):\n"
         "   - Organize by clear day headings: '### Day 1: [Theme / Area Name]', '### Day 2: ...', etc.\n"
         "   - For EACH day, provide:\n"
-        "     * Morning, Afternoon, and Evening activities.\n"
-        "     * Dedicated dining spots matching the user's specific dietary preference (vegan, celiac/gluten-free, halal, local delicacies).\n"
-        "   - Whenever appropriate or when requested, call `generate_destination_image` to generate a scenic postcard image for the key activity or landmark and display it in the response.\n"
-        "2. **Personalization & Proactive Suggestions**: Highlight how recommendations align with the user's party size, dietary safety, and travel style.\n"
-        "3. **Feedback & Confirmation Request**: ALWAYS end your response with a courteous, warm confirmation or feedback question (e.g., 'How does this 3-day pace feel for you and your travel companions? Would you like to adjust any of the dinner reservations, explore budget estimations, or export this into your calendar?')."
+        "     * Morning, Afternoon, and Evening activities grouped logically by neighborhood to minimize transit.\n"
+        "     * Detailed Landmark & Attraction cards with star ratings, category, open hours, and tips.\n"
+        "     * Dedicated authentic dining spots tailored to the traveler's dietary safety (e.g. vegan, celiac/gluten-free, allergy-safe).\n"
+        "   - Call tools actively: `generate_destination_image` for landmarks, `geocode_address` and `search_nearby_places` for coordinates and spots, `convert_currency` for budgets, and `get_live_weather` for local conditions.\n"
+        "2. **Logistics & Transit Notes**: Provide exact transit guidance (e.g. high-speed trains, metro passes, walking times) and essential advance booking windows (e.g. Colosseum, Uffizi, Vatican).\n"
+        "3. **Mistakes & Tourist Traps to Avoid**: List specific timing tips, tourist traps (e.g. non-metered taxis, overpriced tourist-menu cafes), and dress codes.\n"
+        "4. **Feedback & Confirmation Request**: ALWAYS end your response with a courteous confirmation question."
     ),
     ui_description=(
         "If responding with UI, keep every surface tiny, flat, and compact: ONE Card > ONE Column > components. "
