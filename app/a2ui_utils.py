@@ -241,12 +241,26 @@ def a2ui_callback(
         _sanitize_image_components(messages)
 
         if not _surface_is_renderable(messages):
-            # We recognized A2UI but couldn't recover a renderable surface — the
-            # model emitted invalid JSON, a missing surface body, or an undefined
-            # root/child reference. Return clean text instead of a blank card.
+            # If the surface wasn't strictly renderable (e.g. slight ref mismatch or truncated JSON),
+            # extract any Text strings that were in the components so the user actually gets their answer!
+            recovered_texts = []
+            for m in messages:
+                surface = m.get("surfaceUpdate") or {}
+                for c in surface.get("components") or []:
+                    comp = c.get("component") or {}
+                    txt = comp.get("Text", {}).get("text", {}).get("literalString")
+                    if txt and txt not in recovered_texts:
+                        recovered_texts.append(txt)
+            if recovered_texts:
+                answer = "\n\n".join(recovered_texts)
+            else:
+                # Strip raw JSON symbols to present readable text
+                cleaned = re.sub(r'[{}\[\]"]', '', text).strip()
+                answer = cleaned if len(cleaned) > 20 else _FALLBACK_TEXT
+
             return LlmResponse(
                 content=types.Content(
-                    role="model", parts=[types.Part(text=_FALLBACK_TEXT)]
+                    role="model", parts=[types.Part(text=answer)]
                 )
             )
 
