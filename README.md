@@ -4,6 +4,8 @@ An agentic travel concierge and dietary itinerary planner built with Google Agen
 
 ![Wanderlust AI Demo](demo.gif)
 
+> 🎥 **High-Quality Recording**: Download or view the full-fidelity recording with the Gemini World Tour frame: [`demo.webm`](demo.webm)
+
 ---
 
 ## 🌟 What Wanderlust AI Does
