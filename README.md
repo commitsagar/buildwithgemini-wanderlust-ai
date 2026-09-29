@@ -1,94 +1,101 @@
-# simple-agent
+# Wanderlust AI ✈️🌍
 
-Simple ReAct agent
-Agent generated with `agents-cli` version `1.4.0`
+An agentic travel concierge and dietary itinerary planner built with Google Agent Development Kit (ADK) and Gemini on Google Cloud Platform. Wanderlust AI helps travelers research destinations, discover dietary-safe dining (vegan, gluten-free, allergy-conscious), generate scenic vintage postcards, plan daily schedules, and compute travel budgets.
 
-## Project Structure
-
-```
-simple-agent/
-├── app/         # Core agent code
-│   ├── agent.py               # Main agent logic
-│   ├── fast_api_app.py        # FastAPI Backend server
-│   └── app_utils/             # App utilities and helpers
-├── tests/                     # Unit, integration, and load tests
-├── GEMINI.md                  # AI-assisted development guide
-└── pyproject.toml             # Project dependencies
-```
-
-> 💡 **Tip:** Use [Antigravity CLI](https://antigravity.google/) for AI-assisted development - project context is pre-configured in `GEMINI.md`.
-
-## Requirements
-
-Before you begin, ensure you have:
-- **uv**: Python package manager (used for all dependency management in this project) - [Install](https://docs.astral.sh/uv/getting-started/installation/) ([add packages](https://docs.astral.sh/uv/concepts/dependencies/) with `uv add <package>`)
-- **agents-cli**: Agents CLI - Install with `uv tool install google-agents-cli`
-- **Google Cloud SDK**: For GCP services - [Install](https://cloud.google.com/sdk/docs/install)
-
-
-## Quick Start
-
-Install `agents-cli` and its skills if not already installed:
-
-```bash
-uvx google-agents-cli setup
-```
-
-Install required packages:
-
-```bash
-agents-cli install
-```
-
-Test the agent with a local web server:
-
-```bash
-agents-cli playground
-```
-
-You can also use features from the [ADK](https://adk.dev/) CLI with `uv run adk`.
-
-## Commands
-
-| Command              | Description                                                                                 |
-| -------------------- | ------------------------------------------------------------------------------------------- |
-| `agents-cli install` | Install dependencies using uv                                                         |
-| `agents-cli playground` | Launch local development environment                                                  |
-| `agents-cli lint`    | Run code quality checks                                                               |
-| `agents-cli eval`    | Evaluate agent behavior (generate, grade, analyze, and more — see `agents-cli eval --help`) |
-| `uv run pytest tests/unit tests/integration` | Run unit and integration tests                                                        |
-| `agents-cli deploy`  | Deploy agent to Agent Runtime                                                                |
-| `agents-cli publish gemini-enterprise` | Register deployed agent to Gemini Enterprise                    || [A2A Inspector](https://github.com/a2aproject/a2a-inspector) | Launch A2A Protocol Inspector                                                        |
-
-## 🛠️ Project Management
-
-| Command | What It Does |
-|---------|--------------|
-| `agents-cli scaffold enhance` | Add CI/CD pipelines and Terraform infrastructure |
-| `agents-cli infra cicd` | One-command setup of entire CI/CD pipeline + infrastructure |
-| `agents-cli scaffold upgrade` | Auto-upgrade to latest version while preserving customizations |
+![Wanderlust AI Demo](demo.gif)
 
 ---
 
-## Development
+## 🌟 What Wanderlust AI Does
 
-Edit your agent logic in `app/agent.py` and test with `agents-cli playground` - it auto-reloads on save.
+Wanderlust AI is built as a reasoning agent that coordinates specialized tools and services to deliver contextual travel assistance:
 
-## Deployment
+1. **Dietary-Conscious Dining & Destination Knowledge**:
+   - Researches food spots, allergens, and dietary accommodations (vegan, celiac/gluten-free, nut allergies) across global destinations.
+2. **Scenic Visual Postcards (Cloud Storage & Gemini Flash Lite)**:
+   - Uses `gemini-3.1-flash-lite-image` to generate custom destination imagery, saves session artifacts, and uploads the images to a Google Cloud Storage bucket for direct visual display.
+3. **Interactive A2UI Card Responses**:
+   - Delivers structured responses using the open A2UI protocol (v0.8) for clean visual summaries with embedded images and layout components.
+4. **Agent Engine Sandbox Code Execution**:
+   - Performs budget estimations, split calculations, and multi-currency conversions inside a secure Google Cloud Agent Engine Sandbox environment.
+5. **Cross-Session Long-Term Memory**:
+   - Connected to Vertex AI Agent Platform Memory Bank via `PreloadMemoryTool` and automated memory extraction callbacks to remember dietary preferences, favorite cuisines, and previous trips across sessions.
+6. **Live Data Grounding**:
+   - Fetches live weather conditions, local timezones, and address geocoordinates via real-time web grounding and public APIs.
+7. **Trip Bookmarks Persistence (Firestore)**:
+   - Saves favorite restaurants, attractions, and hotels directly into a Google Cloud Firestore collection (`travel_bookmarks`).
+
+---
+
+## 🏗️ Architecture & Google Cloud Stack
+
+- **Agent Framework**: Google Agent Development Kit (ADK) with Gemini 2.5 Flash (`gemini-2.5-flash`).
+- **Agent Protocol**: Agent-to-Agent (A2A) protocol powered by `a2a-sdk`.
+- **UI Engine**: A2UI (v0.8 Basic Catalog) with custom lightweight HTML5/JS renderer.
+- **Agent Platform Memory Bank**: Managed long-term memory via Vertex AI Agent Engine.
+- **Code Execution**: Managed isolated code execution in Agent Engine Sandbox.
+- **Image Generation & Storage**: `gemini-3.1-flash-lite-image` + Google Cloud Storage.
+- **Database**: Google Cloud Firestore (Datastore mode / Native collection).
+- **Frontend / Proxy**: FastAPI server serving an emerald-themed web UI with suggestion chips, communicating over A2A.
+
+---
+
+## 🚀 Local Development & Setup
+
+### Prerequisites
+
+- Python 3.11+
+- `uv` package manager (`curl -LsSf https://astral.sh/uv/install.sh | sh`)
+- Google Cloud SDK (`gcloud`) authenticated to your GCP project:
+  ```bash
+  gcloud auth login
+  gcloud auth application-default login
+  gcloud config set project YOUR_PROJECT_ID
+  ```
+
+### 1. Clone & Install Dependencies
 
 ```bash
-gcloud config set project <your-project-id>
-agents-cli deploy
+git clone https://github.com/commitsagar/buildwithgemini-wanderlust-ai.git
+cd buildwithgemini-wanderlust-ai
+
+# Set up virtual environment and install dependencies
+uv sync
 ```
 
-To add CI/CD and Terraform, run `agents-cli scaffold enhance`.
-To set up your production infrastructure, run `agents-cli infra cicd`.
+### 2. Environment Variables
 
-## Observability
+Create a `.env` file in the project root:
 
-Built-in telemetry exports to Cloud Trace, BigQuery, and Cloud Logging.
+```env
+PROJECT_ID=YOUR_PROJECT_ID
+LOCATION=us-east1
+STORAGE_BUCKET_NAME=YOUR_PUBLIC_GCS_BUCKET
+GOOGLE_MAPS_API_KEY=YOUR_OPTIONAL_MAPS_KEY
+```
 
-## A2A Inspector
+### 3. Run the Agent Locally
 
-This agent supports the [A2A Protocol](https://a2a-protocol.org/). Use the [A2A Inspector](https://github.com/a2aproject/a2a-inspector) to test interoperability.
-See the [A2A Inspector docs](https://github.com/a2aproject/a2a-inspector) for details.
+To launch the local ADK Web playground:
+
+```bash
+uv run adk web . --port 8080 --allow_origins "*" --reload_agents
+```
+
+### 4. Run the Custom Frontend
+
+To launch the standalone FastAPI chat UI with suggestion chips:
+
+```bash
+cd frontend
+pip install -r requirements.txt
+python main.py
+```
+
+Then visit your local browser at `http://localhost:8080`.
+
+---
+
+## 📹 Demo Video
+
+The repository includes `demo.webm` (high-quality recording with the Gemini World Tour frame) and `demo.gif` for inline GitHub viewing.
